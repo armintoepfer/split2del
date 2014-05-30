@@ -26,7 +26,7 @@ Please open an issue on github or write me a [mail](https://github.com/armintoep
   -i          INPUT  : Alignment file in BAM format (required).
   -o          PATH   : Path to the output directory (default: current directory).
 ```
-
+- - -
 ### Technical details
 #####To minimize the memory consumption and the number of full garbage collector executions, use:
 `java -XX:NewRatio=9 -jar split2del.jar`
