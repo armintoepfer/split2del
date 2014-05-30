@@ -7,9 +7,6 @@ If you use Split2Del, please cite <i>Töpfer A.</i> https://github.com/armintoep
 ##### DOWNLOAD:
 Please get the latest binary at [releases](https://github.com/armintoepfer/split2del/releases/latest).
 
-##### FEATURES:
- - Finds and merges split reads with deletions.
-
 ##### ISSUES:
 TODO: https://github.com/armintoepfer/split2del/issues  
 Please open an issue on github or write me a [mail](https://github.com/armintoepfer/split2del/blob/master/README.md#contact)
@@ -20,11 +17,10 @@ Please open an issue on github or write me a [mail](https://github.com/armintoep
  - JDK 7 (http://jdk7.java.net/)
 
 ### RUN:  
- `java -jar split2del.jar -i alignment.bam -r reference.fasta`  
+ `java -jar split2del.jar -i alignment.bam`  
  
 ```
   -i          INPUT  : Alignment file in BAM format (required).
-  -o          PATH   : Path to the output directory (default: current directory).
 ```
 - - -
 ### Technical details
