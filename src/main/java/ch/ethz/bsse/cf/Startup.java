@@ -40,26 +40,6 @@ public class Startup {
     //GENERAL
     @Option(name = "-i")
     private String input;
-    @Option(name = "-o", usage = "Path to the output directory (default: current directory)", metaVar = "PATH")
-    private String output;
-//    @Option(name = "-s")
-//    private boolean singleCore;
-
-    private void setInputOutput() {
-        if (output == null) {
-            this.output = System.getProperty("user.dir") + File.separator;
-        } else {
-            Globals.SAVEPATH = this.output;
-        }
-        if (output.endsWith("/") || output.endsWith("\\")) {
-            if (!new File(this.output).exists()) {
-                if (!new File(this.output).mkdirs()) {
-                    System.out.println("Cannot create directory: " + this.output);
-                }
-            }
-        }
-        Globals.SAVEPATH = this.output;
-    }
 
     private void setMainParameters() {
         Globals.SINGLE_CORE = true;
@@ -79,15 +59,9 @@ public class Startup {
         parser.setUsageWidth(80);
         try {
             parser.parseArgument(args);
-            setInputOutput();
             StringBuilder sb = new StringBuilder();
             for (String arg : args) {
                 sb.append(arg).append(" ");
-            }
-            if (output.endsWith("/") || output.endsWith("\\")) {
-                Utils.appendFile(this.output + File.separator + ".S2D_log", sb.toString() + "\n");
-            } else {
-                Utils.appendFile(System.getProperty("user.dir") + File.separator + ".S2D_log", sb.toString() + "\n");
             }
             setMainParameters();
             parse();
@@ -110,8 +84,6 @@ public class Startup {
             System.err.println(" -------------------------");
             System.err.println(" === GENERAL options ===");
             System.err.println("  -i INPUT\t\t: Alignment file in BAM format (required).");
-            System.err.println("  -o PATH\t\t: Path to the output directory (default: current directory).");
-//            System.err.println("  -s \t\t\t: Single core mode with low memory footprint.");
             System.err.println("");
             System.err.println(" -------------------------");
             System.err.println(" === Technical options ===");
