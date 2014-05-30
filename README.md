@@ -1,18 +1,17 @@
-<h1 align="center"><Split2Del</h1>
-
-### CONTENT:
+<h1 align="center">Split2Del</h1>
 This java command line application merges split read alignments to reconstruct large deletions.
 
-### CITATION:
+##### CITATION:
 If you use Split2Del, please cite <i>Töpfer A.</i> https://github.com/armintoepfer/split2del
 
-### DOWNLOAD:
+##### DOWNLOAD:
 Please get the latest binary at [releases](https://github.com/armintoepfer/split2del/releases/latest).
 
-### FEATURES:
- - Currently only finds split reads, not yet merged.
+##### FEATURES:
+ - Finds and merges split reads with deletions.
 
-### ISSUES:
+##### ISSUES:
+TODO: https://github.com/armintoepfer/split2del/issues
 Please open an issue on github or write me a [mail](https://github.com/armintoepfer/split2del/blob/master/README.md#contact)
 
 - - -
@@ -20,7 +19,7 @@ Please open an issue on github or write me a [mail](https://github.com/armintoep
 #### PREREQUISITES TO RUN:
  - JDK 7 (http://jdk7.java.net/)
 
-## RUN:  
+### RUN:  
  `java -jar split2del.jar -i alignment.bam -r reference.fasta`  
  
 ```
@@ -28,21 +27,21 @@ Please open an issue on github or write me a [mail](https://github.com/armintoep
   -o          PATH   : Path to the output directory (default: current directory).
 ```
 
-## Technical details
+### Technical details
 #####To minimize the memory consumption and the number of full garbage collector executions, use:
 `java -XX:NewRatio=9 -jar split2del.jar`
 
 #####If your dataset is very large and you run out of memory, increase the heapspace with:
 `java -XX:NewRatio=9 -Xms2G -Xmx10G -jar split2del.jar`
 
-### Help:
+#### Help:
  Further help can be showed by running without additional parameters:
   `java -jar split2del.jar`
 
-### PREREQUISITES COMPILE (only for dev):
+#### PREREQUISITES COMPILE (only for dev):
  - Maven 3 (http://maven.apache.org/)
 
-### INSTALL (only for dev):
+#### INSTALL (only for dev):
     cd Split2del
     mvn -DartifactId=samtools -DgroupId=net.sf -Dversion=1.9.6 -Dpackaging=jar -Dfile=src/main/resources/jars/sam-1.96.jar -DgeneratePom=false install:install-file
     mvn clean package
