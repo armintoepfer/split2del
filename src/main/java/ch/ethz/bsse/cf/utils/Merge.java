@@ -99,7 +99,7 @@ public class Merge {
             fwd = r2;
             rev = r;
         } else {
-            System.out.println(r.refStart + (r.forward_strand ? "+" : "-") + r.length + "\t" + r2.refStart + (r2.forward_strand ? "+" : "-") + r2.length);
+//            System.out.println(r.refStart + (r.forward_strand ? "+" : "-") + r.length + "\t" + r2.refStart + (r2.forward_strand ? "+" : "-") + r2.length);
             return;
         }
 

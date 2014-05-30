@@ -82,7 +82,7 @@ public class Utils {
     public static void parseBAM(String location) {
         File bam = new File(location);
         int size = 0;
-        Globals.HEADER.append("@SQ\tVN:1.3\tSO:unsorted\n");
+        Globals.HEADER.append("@HD\tVN:1.3\tSO:unsorted\n");
         try (SAMFileReader sfr = new SAMFileReader(bam)) {
             AbstractBAMFileIndex index = (AbstractBAMFileIndex) sfr.getIndex();
             int nRefs = index.getNumberOfReferences();
