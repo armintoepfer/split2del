@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2013 Armin Töpfer
+ * Copyright (c) 2014 Armin Töpfer
  *
- * This file is part of ConsensusFixer.
+ * This file is part of Split2Del.
  *
- * ConsensusFixer is free software: you can redistribute it and/or modify it
+ * Split2Del is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or any later version.
  *
@@ -13,10 +13,11 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ConsensusFixer. If not, see <http://www.gnu.org/licenses/>.
+ * Split2Del. If not, see <http://www.gnu.org/licenses/>.
  */
 package ch.ethz.bsse.cf.informationholder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,4 +32,7 @@ public class Globals {
     public static String SAVEPATH;
     public static boolean SINGLE_CORE;
     public static final Map<String, List<Read>> READ_MAP = new ConcurrentHashMap<>();
+    public static int MIN_LENGTH = 100;
+    public static final List<Read> FINAL_READS = new ArrayList<>();
+    public static final StringBuilder HEADER = new StringBuilder();
 }

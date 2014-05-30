@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2013 Armin Töpfer
+ * Copyright (c) 2014 Armin Töpfer
  *
- * This file is part of ConsensusFixer.
+ * This file is part of Split2Del.
  *
- * ConsensusFixer is free software: you can redistribute it and/or modify it
+ * Split2Del is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or any later version.
  *
@@ -13,7 +13,7 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ConsensusFixer. If not, see <http://www.gnu.org/licenses/>.
+ * Split2Del. If not, see <http://www.gnu.org/licenses/>.
  */
 package ch.ethz.bsse.cf.utils;
 
@@ -53,10 +53,18 @@ public class SFRComputing {
             Read r = new Read();
             r.refStart = samRecord.getUnclippedStart();
             r.sa = samRecord.getSupplementaryAlignmentFlag();
+            r.read_name = samRecord.getReadName();
+            r.ref_name = samRecord.getReferenceName();
             for (SAMRecord.SAMTagAndValue tav : samRecord.getAttributes()) {
-                if ("SA".equals(tav.tag)) {
-                    r.strand = String.valueOf(tav.value).split(",")[2];
-                    break;
+                switch (tav.tag) {
+                    case "SA":
+                        r.forward_strand = String.valueOf(tav.value).split(",")[2].equals("+");
+                        break;
+                    case "AS":
+                        r.as = (int)tav.value;
+                        break;
+                    default:
+                        break;
                 }
             }
             boolean start = true;
@@ -65,6 +73,7 @@ public class SFRComputing {
                     case X:
                     case EQ:
                     case M:
+                        start = false;
                         if ((readStart + c.getLength()) > samRecord.getReadBases().length) {
                             System.out.println("\nInput alignment is corrupt.\nCIGAR is longer than actual read-length.");
                             System.exit(9);
@@ -77,6 +86,7 @@ public class SFRComputing {
                         }
                         break;
                     case I:
+                        start = false;
                         if ((readStart + c.getLength()) > samRecord.getReadBases().length) {
                             System.out.println("\nInput alignment is corrupt.\nCIGAR is longer than actual read-length.");
                             System.exit(9);
@@ -88,12 +98,14 @@ public class SFRComputing {
                         insertion_offset += c.getLength();
                         break;
                     case D:
+                        start = false;
                         r.cigar.append(c.getLength()).append("D");
                         deletion_offset += c.getLength();
                         break;
                     case S:
                         if (start) {
                             r.refStart += c.getLength();
+                            start = false;
                         }
                         readStart += c.getLength();
                         break;
@@ -116,7 +128,9 @@ public class SFRComputing {
                 }
             }
             r.length = matches + deletion_offset;
-            Globals.READ_MAP.get(samRecord.getReadName()).add(r);
+            if (r.length >= Globals.MIN_LENGTH) {
+                Globals.READ_MAP.get(samRecord.getReadName()).add(r);
+            }
 //                System.out.println(samRecord.getReadName() + "\t" + 0 + "\t" + samRecord.getReferenceName() + "\t" + r.refStart + "\t" + 60 + "\t" + r.cigar.toString() + "\t*\t0\t0" + "\t" + r.sequence.toString() + "\t*" + "\n");
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println();

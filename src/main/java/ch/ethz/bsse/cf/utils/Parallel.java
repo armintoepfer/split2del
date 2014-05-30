@@ -1,13 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package ch.ethz.bsse.cf.utils;
 
 /**
  * Java Parallel.For Parallel.ForEach
  */
-import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -31,6 +26,7 @@ public class Parallel {
 
         for (final T param : parameters) {
             Future<?> future = executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     loopBody.run(param);
                 }
@@ -42,8 +38,7 @@ public class Parallel {
         for (Future<?> f : futures) {
             try {
                 f.get();
-            } catch (InterruptedException e) {
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
             }
         }
 

@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2013 Armin Töpfer
+ * Copyright (c) 2014 Armin Töpfer
  *
- * This file is part of ConsensusFixer.
+ * This file is part of Split2Del.
  *
- * ConsensusFixer is free software: you can redistribute it and/or modify it
+ * Split2Del is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or any later version.
  *
@@ -13,11 +13,12 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ConsensusFixer. If not, see <http://www.gnu.org/licenses/>.
+ * Split2Del. If not, see <http://www.gnu.org/licenses/>.
  */
 package ch.ethz.bsse.cf;
 
 import ch.ethz.bsse.cf.informationholder.Globals;
+import ch.ethz.bsse.cf.informationholder.Read;
 import ch.ethz.bsse.cf.utils.Merge;
 import ch.ethz.bsse.cf.utils.Utils;
 import java.io.File;
@@ -69,8 +70,7 @@ public class Startup {
             throw new CmdLineException("No input given");
         }
         Utils.parseBAM(input);
-        Merge.cleanList();
-        Merge.merge();
+       
     }
 
     public void doMain(String[] args) throws IOException {
@@ -90,8 +90,13 @@ public class Startup {
                 Utils.appendFile(System.getProperty("user.dir") + File.separator + ".S2D_log", sb.toString() + "\n");
             }
             setMainParameters();
-
             parse();
+            Merge.cleanList();
+            Merge.merge();
+            System.out.print(Globals.HEADER.toString());
+            for (Read r : Globals.FINAL_READS) {
+                System.out.println(r.read_name + "\t" + 0 + "\t" + r.ref_name + "\t" + r.refStart + "\t" + 60 + "\t" + r.cigar.toString() + "\t*\t0\t0" + "\t" + r.sequence.toString() + "\t*\tAS:i:" + r.as);
+            }
         } catch (SAMFormatException e) {
             System.err.println("");
             System.err.println("Input file is not in BAM format.");

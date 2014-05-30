@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2013 Armin Töpfer
+ * Copyright (c) 2014 Armin Töpfer
  *
- * This file is part of ConsensusFixer.
+ * This file is part of Split2Del.
  *
- * ConsensusFixer is free software: you can redistribute it and/or modify it
+ * Split2Del is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or any later version.
  *
@@ -13,7 +13,7 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ConsensusFixer. If not, see <http://www.gnu.org/licenses/>.
+ * Split2Del. If not, see <http://www.gnu.org/licenses/>.
  */
 package ch.ethz.bsse.cf.utils;
 
@@ -82,12 +82,14 @@ public class Utils {
     public static void parseBAM(String location) {
         File bam = new File(location);
         int size = 0;
+        Globals.HEADER.append("@SQ\tVN:1.3\tSO:unsorted\n");
         try (SAMFileReader sfr = new SAMFileReader(bam)) {
             AbstractBAMFileIndex index = (AbstractBAMFileIndex) sfr.getIndex();
             int nRefs = index.getNumberOfReferences();
             for (int i = 0; i < nRefs; i++) {
                 BAMIndexMetaData meta = index.getMetaData(i);
                 size += meta.getAlignedRecordCount();
+                Globals.HEADER.append("@SQ\tSN:").append(sfr.getFileHeader().getSequence(i).getSequenceName()).append("\tLN:").append(sfr.getFileHeader().getSequence(i).getSequenceLength()).append("\n");
             }
         }
         StatusUpdate.getINSTANCE().printForce("Read count\t\t" + size);
