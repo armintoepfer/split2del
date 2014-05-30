@@ -11,7 +11,7 @@ Please get the latest binary at [releases](https://github.com/armintoepfer/split
  - Finds and merges split reads with deletions.
 
 ##### ISSUES:
-TODO: https://github.com/armintoepfer/split2del/issues
+TODO: https://github.com/armintoepfer/split2del/issues  
 Please open an issue on github or write me a [mail](https://github.com/armintoepfer/split2del/blob/master/README.md#contact)
 
 - - -
