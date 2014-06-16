@@ -104,6 +104,7 @@ public class SFRComputing {
                         break;
                     case S:
                         if (start) {
+                            r.internal_offset = c.getLength();
                             r.refStart += c.getLength();
                             start = false;
                         }
@@ -111,6 +112,7 @@ public class SFRComputing {
                         break;
                     case H:
                         if (start) {
+                            r.internal_offset = c.getLength();
                             r.refStart += c.getLength();
                             start = false;
                         }
@@ -127,6 +129,7 @@ public class SFRComputing {
                         break;
                 }
             }
+            r.matches = matches+insertion_offset;
             r.length = matches + deletion_offset;
             if (r.length >= Globals.MIN_LENGTH) {
                 Globals.READ_MAP.get(samRecord.getReadName()).add(r);

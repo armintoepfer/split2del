@@ -24,6 +24,7 @@ public class Read {
 
     public int refStart;
     public int length;
+    public int matches;
     public StringBuilder cigar = new StringBuilder();
     public StringBuilder sequence = new StringBuilder();
     public StringBuilder quality = new StringBuilder();
@@ -32,6 +33,7 @@ public class Read {
     public String read_name;
     public String ref_name;
     public int as;
+    public int internal_offset = 0;
 
     public Read() {
     }

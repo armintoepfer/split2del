@@ -20,6 +20,8 @@ package ch.ethz.bsse.cf.utils;
 import ch.ethz.bsse.cf.informationholder.Globals;
 import ch.ethz.bsse.cf.informationholder.Read;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -78,17 +80,63 @@ public class Merge {
         if (l == null || l.size() < 2) {
             return;
         } else {
-            for (Read r : l) {
-                for (Read r2 : l) {
-                    if (r != r2) {
-                        mergeReads(r, r2);
-                    }
+            Collections.sort(l, new Comparator<Read>() {
+                @Override
+                public int compare(Read o1, Read o2) {
+                    return new Integer(o1.internal_offset).compareTo(o2.internal_offset);
+                }
+            });
+            for (int i = 1; i < l.size(); ++i) {
+                if (l.get(i - 1).internal_offset + l.get(i - 1).matches > l.get(i).internal_offset) {
+                    return;
                 }
             }
+            Read tmp = l.get(0);
+            for (int i = 1; i < l.size(); ++i) {
+                tmp = mergeReadsPairwiseTmp(tmp, l.get(i));
+            }
+            Globals.FINAL_READS.add(tmp);
+
+            //Merge pairwise oldsql
+//            for (Read r : l) {
+//                for (Read r2 : l) {
+//                    if (r != r2) {
+//                        mergeReadsPairwise(r, r2);
+//                    }
+//                }
+//            }
         }
     }
 
-    private static void mergeReads(Read r, Read r2) {
+    private static Read mergeReadsPairwiseTmp(Read r, Read r2) {
+        Read nr = new Read();
+        Read fwd;
+        Read rev;
+        if (r.refStart < r2.refStart && r.getEnd() < r2.refStart) {
+            fwd = r;
+            rev = r2;
+        } else if (r.refStart > r2.refStart && r.refStart > r2.getEnd()) {
+            fwd = r2;
+            rev = r;
+        } else {
+//            System.out.println(r.refStart + (r.forward_strand ? "+" : "-") + r.length + "\t" + r2.refStart + (r2.forward_strand ? "+" : "-") + r2.length);
+            return null;
+        }
+
+        int gap = rev.refStart - (fwd.refStart + fwd.length);
+        nr.length = (rev.refStart + rev.length) - fwd.refStart;
+        nr.forward_strand = fwd.forward_strand;
+        nr.sequence = new StringBuilder().append(fwd.sequence).append(rev.sequence);
+        nr.quality = new StringBuilder().append(fwd.quality).append(rev.quality);
+        nr.cigar = new StringBuilder().append(fwd.cigar).append(gap).append("D").append(rev.cigar);
+        nr.read_name = fwd.read_name;
+        nr.ref_name = fwd.ref_name;
+        nr.refStart = fwd.refStart;
+        nr.as = fwd.as + rev.as;
+        return nr;
+    }
+
+    private static void mergeReadsPairwise(Read r, Read r2) {
         Read nr = new Read();
         Read fwd;
         Read rev;
