@@ -20,7 +20,10 @@ Please open an issue on github or write me a [mail](https://github.com/armintoep
  `java -jar split2del.jar -i alignment.bam`  
  
 ```
-  -i          INPUT  : Alignment file in BAM format (required).
+  -i INPUT       : Alignment file in BAM format (required).
+  -fix           : Provide prefix/suffix of each deletion per read.
+  -consensus     : Provide prefix/suffix consensus sequences (only works with -fix).
+  -splength INT  : Length of the prefix/suffix [Default: 5].
 ```
 - - -
 ### Technical details
