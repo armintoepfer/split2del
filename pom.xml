@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.ethz.bsse</groupId>
-    <artifactId>consensusfixer</artifactId>
+    <artifactId>split2del</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
     <name>Split2Del</name>
@@ -64,7 +64,7 @@
                             <attachToBuild>true</attachToBuild>
                             <!-- Optional, default is "onejar" -->
                             <classifier>full</classifier>
-                            <filename>Split2Del.jar</filename>
+                            <filename>split2del.jar</filename>
                         </configuration>
                         <goals>
                             <goal>one-jar</goal>
@@ -101,11 +101,6 @@
             <groupId>net.sf</groupId>
             <artifactId>samtools</artifactId>
             <version>1.9.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>14.0.1</version>
         </dependency>
     </dependencies>
     <pluginRepositories>
