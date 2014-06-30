@@ -3,9 +3,9 @@
  *
  * This file is part of Split2Del.
  *
- * Split2Del is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or any later version.
+ * Split2Del is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or any later version.
  *
  * ConsensusFixer is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -17,12 +17,15 @@
  */
 package ch.ethz.bsse.cf;
 
+import ch.ethz.bsse.cf.informationholder.Deletion;
 import ch.ethz.bsse.cf.informationholder.Globals;
 import ch.ethz.bsse.cf.informationholder.Read;
 import ch.ethz.bsse.cf.utils.Merge;
 import ch.ethz.bsse.cf.utils.Utils;
-import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.sf.samtools.SAMFormatException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -40,9 +43,17 @@ public class Startup {
     //GENERAL
     @Option(name = "-i")
     private String input;
+    @Option(name = "-fix")
+    private boolean fix;
+    @Option(name = "-consensus")
+    private boolean consensus;
+    @Option(name = "-splength")
+    private int fl = 5;
 
     private void setMainParameters() {
         Globals.SINGLE_CORE = true;
+        Globals.PRE_SUF_LENGTH = fl;
+        Globals.FIX = fix;
     }
 
     private void parse() throws CmdLineException {
@@ -50,7 +61,7 @@ public class Startup {
             throw new CmdLineException("No input given");
         }
         Utils.parseBAM(input);
-       
+
     }
 
     public void doMain(String[] args) throws IOException {
@@ -67,9 +78,156 @@ public class Startup {
             parse();
             Merge.cleanList();
             Merge.merge();
-            System.out.print(Globals.HEADER.toString());
-            for (Read r : Globals.FINAL_READS) {
-                System.out.println(r.read_name + "\t" + 0 + "\t" + r.ref_name + "\t" + r.refStart + "\t" + 60 + "\t" + r.cigar.toString() + "\t*\t0\t0" + "\t" + r.sequence.toString() + "\t*\tAS:i:" + r.as);
+            if (fix) {
+                System.out.println("Position\tDeletion_length\tCount\tPrefix\tSuffix");
+                for (Map.Entry<Integer, List<Deletion>> e : Globals.DEL_MAP.entrySet()) {
+                    if (consensus) {
+                        
+                        Map<Integer, char[][]> consensus_map_prefix = new HashMap<>();
+                        Map<Integer, char[][]> consensus_map_suffix = new HashMap<>();
+                        
+                        for (Deletion d : e.getValue()) {
+                            {
+                                if (!consensus_map_prefix.containsKey(d.del_length)) {
+                                    consensus_map_prefix.put(d.del_length, new char[fl + 1][4]);
+                                }
+                                int i = 0;
+                                for (char c : d.prefix.toCharArray()) {
+                                    int j = 0;
+                                    switch (c) {
+                                        case 'A':
+                                            j = 0;
+                                            break;
+                                        case 'C':
+                                            j = 1;
+                                            break;
+                                        case 'G':
+                                            j = 2;
+                                            break;
+                                        case 'T':
+                                            j = 3;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    System.out.print("");
+                                    if (i >= d.prefix.toCharArray().length) {
+                                        System.err.println("ERROR");
+                                        System.exit(0);
+                                    }
+                                    if (j >= fl) {
+                                        System.err.println("ERROR 2");
+                                        System.exit(0);
+                                    }
+                                    consensus_map_prefix.get(d.del_length)[i++][j]++;
+                                }
+                            }
+                            {
+                                if (!consensus_map_suffix.containsKey(d.del_length)) {
+                                    consensus_map_suffix.put(d.del_length, new char[fl + 1][4]);
+                                }
+                                int i = 0;
+                                for (char c : d.suffix.toCharArray()) {
+                                    int j = 0;
+                                    switch (c) {
+                                        case 'A':
+                                            j = 0;
+                                            break;
+                                        case 'C':
+                                            j = 1;
+                                            break;
+                                        case 'G':
+                                            j = 2;
+                                            break;
+                                        case 'T':
+                                            j = 3;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    System.out.print("");
+                                    if (i >= d.suffix.toCharArray().length) {
+                                        System.err.println("ERROR");
+                                        System.exit(0);
+                                    }
+                                    if (j >= fl) {
+                                        System.err.println("ERROR 2");
+                                        System.exit(0);
+                                    }
+                                    consensus_map_suffix.get(d.del_length)[i++][j]++;
+                                }
+                            }
+                        }
+                        for (Map.Entry<Integer, char[][]> e2 : consensus_map_prefix.entrySet()) {
+                            System.out.print(e.getKey() + "\t" + e2.getKey() + "\t");
+                            int sum = e2.getValue()[0][0]+e2.getValue()[0][1]+e2.getValue()[0][2]+e2.getValue()[0][3];
+                            System.out.print(sum + "\t");
+                            for (int i = 0; i < fl + 1; i++) {
+                                int max = 0;
+                                char base = ' ';
+                                for (int j = 0; j < 4; j++) {
+                                    if (e2.getValue()[i][j] >= max) {
+                                        max = e2.getValue()[i][j];
+                                        switch (j) {
+                                            case 0:
+                                                base = 'A';
+                                                break;
+                                            case 1:
+                                                base = 'C';
+                                                break;
+                                            case 2:
+                                                base = 'G';
+                                                break;
+                                            case 3:
+                                                base = 'T';
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                                System.out.print(base);
+                            }
+                            System.out.print("\t");
+                            for (int i = 0; i < fl+1; i++) {
+                                int max = 0;
+                                char base = ' ';
+                                for (int j = 0; j < 4; j++) {
+                                    if (consensus_map_suffix.get(e2.getKey())[i][j] >= max) {
+                                        max = consensus_map_suffix.get(e2.getKey())[i][j];
+                                        switch (j) {
+                                            case 0:
+                                                base = 'A';
+                                                break;
+                                            case 1:
+                                                base = 'C';
+                                                break;
+                                            case 2:
+                                                base = 'G';
+                                                break;
+                                            case 3:
+                                                base = 'T';
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                                System.out.print(base);
+                            }
+                            System.out.println("");
+                        }
+                    } else {
+                        for (Deletion d : e.getValue()) {
+                            System.out.println(e.getKey() + "\t" + d.del_length + "\t" + d.prefix + "\t" + d.suffix);
+                        }
+                    }
+                }
+            } else {
+                System.out.print(Globals.HEADER.toString());
+                for (Read r : Globals.FINAL_READS) {
+                    System.out.println(r.read_name + "\t" + 0 + "\t" + r.ref_name + "\t" + r.refStart + "\t" + 60 + "\t" + r.cigar.toString() + "\t*\t0\t0" + "\t" + r.sequence.toString() + "\t*\tAS:i:" + r.as);
+                }
             }
         } catch (SAMFormatException e) {
             System.err.println("");

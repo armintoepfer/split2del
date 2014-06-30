@@ -17,18 +17,26 @@
  */
 package ch.ethz.bsse.cf.utils;
 
+import ch.ethz.bsse.cf.informationholder.Deletion;
 import ch.ethz.bsse.cf.informationholder.Globals;
 import ch.ethz.bsse.cf.informationholder.Read;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import net.sf.samtools.BAMRecord;
+import net.sf.samtools.Cigar;
+import net.sf.samtools.CigarElement;
+import net.sf.samtools.SAMRecord;
 
 /**
  * @author Armin Töpfer (armin.toepfer [at] gmail.com)
  */
 public class Merge {
+
+    static int counts = 0;
 
     public static void cleanList() {
         double oldSize = Globals.READ_MAP.size();
@@ -74,6 +82,7 @@ public class Merge {
             loopSingleDirection(forward);
             loopSingleDirection(reverse);
         }
+//        System.out.println("\n"+counts+"\n");
     }
 
     private static void loopSingleDirection(List<Read> l) {
@@ -88,14 +97,73 @@ public class Merge {
             });
             for (int i = 1; i < l.size(); ++i) {
                 if (l.get(i - 1).internal_offset + l.get(i - 1).matches > l.get(i).internal_offset) {
-                    return;
+                    int overlap = (l.get(i - 1).internal_offset + l.get(i - 1).matches) - l.get(i).internal_offset;
+                    if (overlap > 0 && overlap <= 10) {
+                        Read r = l.get(i);
+                        SAMRecord s = new SAMRecord(null);
+                        s.setCigarString(r.cigar.toString());
+                        r.cigar.setLength(0);
+                        Cigar cigar = s.getCigar();
+                        boolean firstMatch = true;
+                        for (CigarElement ce : cigar.getCigarElements()) {
+                            switch (ce.getOperator()) {
+                                case X:
+                                case EQ:
+                                case M:
+                                    if (firstMatch) {
+                                        r.cigar.append(ce.getLength() - overlap).append("M");
+                                        firstMatch = false;
+                                        break;
+                                    }
+                                case I:
+                                case D:
+                                case S:
+                                case H:
+                                case P:
+                                case N:
+                                default:
+                                    r.cigar.append(ce.getLength()).append(ce.getOperator());
+                                    break;
+                            }
+                        }
+                        r.internal_offset += overlap;
+                        r.refStart += overlap;
+                        String tmpS = r.sequence.substring(overlap);
+                        r.sequence.setLength(0);
+                        r.sequence.append(tmpS);
+                        r.length -= overlap;
+                        r.matches -= overlap;
+//                        String tmpQ = r.quality.substring(1);
+//                        r.quality.setLength(0);
+//                        r.quality.append(tmpQ);
+                    } else {
+                        for (Read rs : l) {
+                            Globals.FINAL_READS.add(rs);
+                        }
+                        counts++;
+                        return;
+                    }
                 }
             }
-            Read tmp = l.get(0);
-            for (int i = 1; i < l.size(); ++i) {
-                tmp = mergeReadsPairwiseTmp(tmp, l.get(i));
+            if (!Globals.FIX) {
+                Read tmp = l.get(0);
+                for (int i = 1; i < l.size(); ++i) {
+//                    if (tmp == null || l.get(i) == null) {
+//                        System.err.println("");
+//                    }
+                    tmp = mergeReadsPairwiseTmp(tmp, l.get(i));
+                    if (tmp == null) {
+                        break;
+                    }
+                }
+                if (tmp != null) {
+                    Globals.FINAL_READS.add(tmp);
+                }
+            } else {
+                for (int i = 1; i < l.size(); ++i) {
+                    Globals.FINAL_READS.add(mergeReadsPairwiseTmp(l.get(i - 1), l.get(i)));
+                }
             }
-            Globals.FINAL_READS.add(tmp);
 
             //Merge pairwise oldsql
 //            for (Read r : l) {
@@ -133,6 +201,14 @@ public class Merge {
         nr.ref_name = fwd.ref_name;
         nr.refStart = fwd.refStart;
         nr.as = fwd.as + rev.as;
+
+        int global_position = fwd.refStart + fwd.length;
+        if (Globals.FIX) {
+            if (!Globals.DEL_MAP.containsKey(global_position)) {
+                Globals.DEL_MAP.put(global_position, new LinkedList<Deletion>());
+            }
+            Globals.DEL_MAP.get(global_position).add(new Deletion(rev.sequence.substring(0, Globals.PRE_SUF_LENGTH + 1), fwd.sequence.substring(fwd.matches - Globals.PRE_SUF_LENGTH - 1, fwd.matches), gap));
+        }
         return nr;
     }
 

@@ -18,6 +18,7 @@
 package ch.ethz.bsse.cf.informationholder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,4 +36,7 @@ public class Globals {
     public static int MIN_LENGTH = 100;
     public static final List<Read> FINAL_READS = new ArrayList<>();
     public static final StringBuilder HEADER = new StringBuilder();
+    public static final Map<Integer, List<Deletion>> DEL_MAP = new HashMap<>();
+    public static int PRE_SUF_LENGTH = 5;
+    public static boolean FIX;
 }
