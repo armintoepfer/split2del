@@ -242,16 +242,17 @@ public class Startup {
             System.err.println(" -------------------------");
             System.err.println(" === GENERAL options ===");
             System.err.println("  -i INPUT\t\t: Alignment file in BAM format (required).");
+            System.err.println("  -fix\t\t\t: Provide prefix/suffix of each deletion per read.");
+            System.err.println("  -consensus\t\t: Provide prefix/suffix consensus sequences (only works with -fix).");
+            System.err.println("  -splength INT\t\t: Length of the prefix/suffix [Default: 5].");
             System.err.println("");
             System.err.println(" -------------------------");
             System.err.println(" === Technical options ===");
             System.err.println("  -XX:NewRatio=9\t: Reduces the memory consumption (RECOMMENDED to use).");
             System.err.println("  -Xms2G -Xmx10G\t: Increase heap space.");
-            System.err.println("  -XX:+UseParallelGC\t: Enhances performance on multicore systems.");
-            System.err.println("  -XX:+UseNUMA\t\t: Enhances performance on multi-CPU systems.");
             System.err.println(" -------------------------");
             System.err.println(" === EXAMPLES ===");
-            System.err.println("   java -XX:+UseParallelGC -Xms2g -Xmx10g -XX:+UseNUMA -XX:NewRatio=9 -jar Split2Del.jar -i alignment.bam -r reference.fasta");
+            System.err.println("   java -Xms2g -Xmx10g -XX:NewRatio=9 -jar splitdDel.jar -i alignment.bam");
             System.err.println(" -------------------------");
         }
     }
