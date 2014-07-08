@@ -111,7 +111,12 @@ public class Merge {
                                 case EQ:
                                 case M:
                                     if (firstMatch) {
-                                        r.cigar.append(ce.getLength() - overlap).append("M");
+                                        if (ce.getLength() - overlap < 0) {
+                                            return;
+                                        }
+                                        if (ce.getLength() - overlap > 0) {
+                                            r.cigar.append(ce.getLength() - overlap).append("M");
+                                        }
                                         firstMatch = false;
                                         break;
                                     }
