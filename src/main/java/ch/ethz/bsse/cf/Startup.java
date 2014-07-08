@@ -82,10 +82,10 @@ public class Startup {
                 System.out.println("Position\tDeletion_length\tCount\tPrefix\tSuffix");
                 for (Map.Entry<Integer, List<Deletion>> e : Globals.DEL_MAP.entrySet()) {
                     if (consensus) {
-                        
+
                         Map<Integer, char[][]> consensus_map_prefix = new HashMap<>();
                         Map<Integer, char[][]> consensus_map_suffix = new HashMap<>();
-                        
+
                         for (Deletion d : e.getValue()) {
                             {
                                 if (!consensus_map_prefix.containsKey(d.del_length)) {
@@ -160,7 +160,7 @@ public class Startup {
                         }
                         for (Map.Entry<Integer, char[][]> e2 : consensus_map_prefix.entrySet()) {
                             System.out.print(e.getKey() + "\t" + e2.getKey() + "\t");
-                            int sum = e2.getValue()[0][0]+e2.getValue()[0][1]+e2.getValue()[0][2]+e2.getValue()[0][3];
+                            int sum = e2.getValue()[0][0] + e2.getValue()[0][1] + e2.getValue()[0][2] + e2.getValue()[0][3];
                             System.out.print(sum + "\t");
                             for (int i = 0; i < fl + 1; i++) {
                                 int max = 0;
@@ -189,7 +189,7 @@ public class Startup {
                                 System.out.print(base);
                             }
                             System.out.print("\t");
-                            for (int i = 0; i < fl+1; i++) {
+                            for (int i = 0; i < fl + 1; i++) {
                                 int max = 0;
                                 char base = ' ';
                                 for (int j = 0; j < 4; j++) {
@@ -226,7 +226,7 @@ public class Startup {
             } else {
                 System.out.print(Globals.HEADER.toString());
                 for (Read r : Globals.FINAL_READS) {
-                    System.out.println(r.read_name + "\t" + 0 + "\t" + r.ref_name + "\t" + r.refStart + "\t" + 60 + "\t" + r.cigar.toString() + "\t*\t0\t0" + "\t" + r.sequence.toString() + "\t*\tAS:i:" + r.as);
+                    System.out.println(r.read_name + "\t" + 0 + "\t" + r.ref_name + "\t" + r.refStart + "\t" + 60 + "\t" + r.cigar.toString() + "\t*\t0\t0" + "\t" + r.sequence.toString() + "\t" + r.quality.toString() + "\tAS:i:" + r.as);
                 }
             }
         } catch (SAMFormatException e) {

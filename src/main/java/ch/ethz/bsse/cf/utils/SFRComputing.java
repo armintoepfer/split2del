@@ -82,6 +82,7 @@ public class SFRComputing {
                         matches += c.getLength();
                         for (int i = 0; i < c.getLength(); i++) {
                             r.sequence.append((char) samRecord.getReadBases()[readStart + insertion_offset]);
+                            r.quality.append(samRecord.getBaseQualityString().charAt(readStart + insertion_offset));
                             readStart++;
                         }
                         break;
@@ -94,6 +95,7 @@ public class SFRComputing {
                         r.cigar.append(c.getLength()).append("I");
                         for (int i = 0; i < c.getLength(); i++) {
                             r.sequence.append((char) samRecord.getReadBases()[readStart + i + insertion_offset]);
+                            r.quality.append(samRecord.getBaseQualityString().charAt(readStart + i + insertion_offset));
                         }
                         insertion_offset += c.getLength();
                         break;

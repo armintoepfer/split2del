@@ -138,9 +138,9 @@ public class Merge {
                         r.sequence.append(tmpS);
                         r.length -= overlap;
                         r.matches -= overlap;
-//                        String tmpQ = r.quality.substring(1);
-//                        r.quality.setLength(0);
-//                        r.quality.append(tmpQ);
+                        String tmpQ = r.quality.substring(overlap);
+                        r.quality.setLength(0);
+                        r.quality.append(tmpQ);
                     } else {
                         for (Read rs : l) {
                             Globals.FINAL_READS.add(rs);
